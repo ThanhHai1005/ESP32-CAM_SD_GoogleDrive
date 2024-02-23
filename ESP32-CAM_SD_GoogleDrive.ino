@@ -1,4 +1,3 @@
-
 const char* ssid     = "ThanhHai";   //Wi-Fi
 const char* password = "11111111";   //Wi-Fi
 
