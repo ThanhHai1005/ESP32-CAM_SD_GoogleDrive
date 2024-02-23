@@ -1,8 +1,4 @@
-/*
- * Copyright (c) 2013 Adam Rudd.
- * See LICENSE for more information
- * https://github.com/adamvr/arduino-base64 
- */
+
 #if (defined(__AVR__))
 #include <avr\pgmspace.h>
 #else

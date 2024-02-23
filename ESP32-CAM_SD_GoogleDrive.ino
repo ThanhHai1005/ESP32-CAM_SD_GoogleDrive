@@ -1,65 +1,23 @@
-/*
-ESP32-CAM (Read the image file from SD card and upload it to Google Drive)
-Author : ChungYi Fu (Kaohsiung, Taiwan)  2021-6-9 21:30
-https://www.facebook.com/francefu
 
-如何新增Google Script
-https://www.youtube.com/watch?v=f46VBqWwUuI
-
-Google Script管理介面
-https://script.google.com/home
-https://script.google.com/home/executions
-
-Google雲端硬碟
-https://drive.google.com/drive/my-drive
-
-Google Script程式碼
-function doPost(e) {
-  var myFoldername = e.parameter.myFoldername;  //取得資料夾名
-  var myFile = e.parameter.myFile;  //取得影像
-  var myFilename = Utilities.formatDate(new Date(), "GMT+8", "yyyyMMddHHmmss")+"_"+e.parameter.myFilename;  ////取得影像檔名
-  
-  var contentType = myFile.substring(myFile.indexOf(":")+1, myFile.indexOf(";"));
-  var data = myFile.substring(myFile.indexOf(",")+1);
-  data = Utilities.base64Decode(data);
-  var blob = Utilities.newBlob(data, contentType, myFilename);
-  
-  var folder, folders = DriveApp.getFoldersByName(myFoldername);
-  if (folders.hasNext()) {
-    folder = folders.next();
-  } else {
-    folder = DriveApp.createFolder(myFoldername);
-  }
-  var file = folder.createFile(blob);    
-  file.setDescription("Uploaded by " + myFilename);
-  
-  var imageID = file.getUrl().substring(file.getUrl().indexOf("/d/")+3,file.getUrl().indexOf("view")-1);
-  var imageUrl = "https://drive.google.com/uc?authuser=0&id="+imageID; 
-    
-  return  ContentService.createTextOutput(myFoldername+"/"+myFilename+"\n"+imageUrl);
-}
-*/
-
-
-const char* ssid     = "phuc";   //Wi-Fi
+const char* ssid     = "ThanhHai";   //Wi-Fi
 const char* password = "11111111";   //Wi-Fi
 
 const char* myDomain = "script.google.com";
-String myScript = "/macros/s/AKfycbw4MoVykUklh5mgb8ft-3VUwksZyGfHgBm_YIiGAcut1v5nhpluJ_4lVV7tFQOxxOU/exec";    //設定Google Script路徑
-String myFoldername = "&myFoldername=ESP32-CAM";    //設定Google drive存放影像資料夾名
-String myFilename = "&myFilename=ESP32-CAM.jpg";    //設定Google drive存放影像檔名
+String myScript = "/macros/s/AKfycbw4MoVykUklh5mgb8ft-3VUwksZyGfHgBm_YIiGAcut1v5nhpluJ_4lVV7tFQOxxOU/exec";    //Setting up Google Scripts
+String myFoldername = "&myFoldername=ESP32-CAM";    
+String myFilename = "&myFilename=ESP32-CAM.jpg";    
 String myImage = "&myFile=";
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include "soc/soc.h"            //用於電源不穩不重開機
-#include "soc/rtc_cntl_reg.h"   //用於電源不穩不重開機
-#include "FS.h"                 //file system wrapper
-#include "SD_MMC.h"             //SD卡存取函式庫
-#include "Base64.h"             //不可使用Arduino IDE內建的函式庫，請從github下載Base64.cpp, Base64.h置於同一資料夾
+#include "soc/soc.h"            
+#include "soc/rtc_cntl_reg.h"   
+#include "FS.h"                 
+#include "SD_MMC.h"            
+#include "Base64.h"             
 
 void setup() {
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);  //關閉電壓不穩時重啟電源設定
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);  
   
   Serial.begin(115200);
   delay(10);
@@ -96,12 +54,12 @@ void setup() {
     ledcDetachPin(3);
         
     delay(1000);
-    ESP.restart();   //若未連上Wi-Fi閃燈兩次後重啟
+    ESP.restart();   
   }
   else {
     ledcAttachPin(4, 3);
     ledcSetup(3, 5000, 8);
-    for (int i=0;i<5;i++) {   //若連上Wi-Fi閃燈五次
+    for (int i=0;i<5;i++) {  
       ledcWrite(3,10);
       delay(200);
       ledcWrite(3,0);
@@ -110,7 +68,7 @@ void setup() {
     ledcDetachPin(3);      
   }
 
-  //SD Card偵測
+  //SD Card
   if(!SD_MMC.begin()){
     Serial.println("Card Mount Failed");
     return;
@@ -140,8 +98,6 @@ void setup() {
   Serial.println();
   
   SD_MMC.end();   
-
-  //閃光燈
   ledcAttachPin(4, 4);  
   ledcSetup(4, 5000, 8); 
 
@@ -248,7 +204,6 @@ String sendSDImageToGoogleDrive(String filepath)
   return getBody;
 }
 
-//https://github.com/zenmanenergy/ESP8266-Arduino-Examples/
 String urlencode(String str)
 {
     String encodedString="";
